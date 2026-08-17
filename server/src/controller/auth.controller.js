@@ -3,6 +3,7 @@ const express = require('express');
 const User = require('../model/user.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { SetUser } = require('../service/auth.service');
 
 async function register(req,res){
 try{
@@ -41,15 +42,11 @@ async function login(req,res){
     if(!passwordMatches){
         return res.status(401).json({error:'Invalid email and password'});
     }
-    const token = jwt.sign(
-        {id:user.id, email:user.email},
-        process.env.JWT_SECRET,
-        {expiresIn:'7d'}
-    );
+    const token = SetUser(user);
    res.json({
     message:'Login successful',
     token,
-    user: { id:user.id, name:user.name, email:user.email },
+    user: {id:user.id, name:user.name, email:user.email},
    });
   }catch(err){
    console.error(err);
